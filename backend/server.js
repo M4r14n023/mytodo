@@ -34,11 +34,12 @@ app.get('/api/todos', async (req, res) => {
 app.post('/api/todos', async (req, res) => {
     const newTodo = new Todo({
         text: req.body.text,
+        completed: false, // Asumiendo que todas las tareas son incompletas al principio
     });
 
     try {
         const savedTodo = await newTodo.save();
-        res.status(201).json(savedTodo);
+        res.status(201).json(savedTodo); // 201 es el código de éxito para creación
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

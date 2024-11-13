@@ -26,16 +26,20 @@ function App() {
     fetchTodos();
   }, []); // Dependencia vacía para que solo se ejecute una vez
 
-  // Agregar tarea
-  const handleAdd = async (text) => {
-    const newTodo = { text, completed: false };
-    try {
-      const response = await axios.post('https://mytodo-c4mh.onrender.com/api/todos', newTodo);
-      setTodos((prevTodos) => [...prevTodos, response.data]); // Usar el estado anterior para evitar posibles problemas de sincronización
-    } catch (error) {
-      setError('Error adding todo: ' + error.message);
+// Agregar tarea
+const handleAdd = async (text) => {
+  const newTodo = { text, completed: false };
+  try {
+    const response = await axios.post('https://mytodo-c4mh.onrender.com/api/todos', newTodo);
+    
+    // Verifica si el backend ha respondido correctamente con el nuevo todo
+    if (response.status === 201) {
+      setTodos((prevTodos) => [...prevTodos, response.data]);
     }
-  };
+  } catch (error) {
+    setError('Error adding todo: ' + error.message);
+  }
+};
 
   // Marcar tarea como completada o no
   const handleToggle = async (id) => {
