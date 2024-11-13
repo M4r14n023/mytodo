@@ -1,31 +1,49 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import TodoForm from './TodoForm';
 import TodoList from './TodoList';
 
 function App() {
-  const [todos, setTodos] = useState([
-    { id: 1, text: 'Hacer compras', completed: false },
-    { id: 2, text: 'Estudiar React', completed: false },
-  ]);
+  const [todos, setTodos] = useState([]);
 
+  // Cargar las tareas desde el backend (MongoDB)
+  useEffect(() => {
+    axios.get('https://your-backend-url.onrender.com/api/todos') // Cambia por tu URL de backend
+      .then(response => setTodos(response.data))
+      .catch(error => console.error('Error fetching todos:', error));
+  }, []);
+
+  // Agregar tarea
   const handleAdd = (text) => {
-    const newTodo = {
-      id: todos.length + 1,
-      text,
-      completed: false,
-    };
-    setTodos([...todos, newTodo]);
+    const newTodo = { text, completed: false };
+    axios.post('https://your-backend-url.onrender.com/api/todos', newTodo)
+      .then(response => {
+        setTodos([...todos, response.data]); // Agregar la tarea recién creada al estado
+      })
+      .catch(error => console.error('Error adding todo:', error));
   };
 
+  // Marcar tarea como completada o no
   const handleToggle = (id) => {
-    setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ));
+    const updatedTodos = todos.map(todo =>
+      todo._id === id ? { ...todo, completed: !todo.completed } : todo
+    );
+    setTodos(updatedTodos);
+
+    // Actualizar en el backend
+    const todoToUpdate = updatedTodos.find(todo => todo._id === id);
+    axios.put(`https://your-backend-url.onrender.com/api/todos/${id}`, todoToUpdate)
+      .catch(error => console.error('Error updating todo:', error));
   };
 
+  // Eliminar tarea
   const handleRemove = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+    axios.delete(`https://your-backend-url.onrender.com/api/todos/${id}`)
+      .then(() => {
+        setTodos(todos.filter(todo => todo._id !== id)); // Eliminar del estado local
+      })
+      .catch(error => console.error('Error deleting todo:', error));
   };
 
   return (
@@ -41,6 +59,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
