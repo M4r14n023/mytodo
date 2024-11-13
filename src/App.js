@@ -9,7 +9,7 @@ function App() {
 
   // Cargar las tareas desde el backend (MongoDB)
   useEffect(() => {
-    axios.get('https://mytodo-c4mh.onrender.com/api/todos') // Cambia por tu URL de backend
+    axios.get('https://mytodo-c4mh.onrender.com/api/todos/') // Cambia por tu URL de backend
       .then(response => setTodos(response.data))
       .catch(error => console.error('Error fetching todos:', error));
   }, []); 
@@ -17,7 +17,7 @@ function App() {
   // Agregar tarea
   const handleAdd = (text) => {
     const newTodo = { text, completed: false };
-    axios.post('https://mytodo-c4mh.onrender.com/api/todos', newTodo)
+    axios.post('https://mytodo-c4mh.onrender.com/api/todos/', newTodo)
       .then(response => {
         setTodos([...todos, response.data]); // Agregar la tarea recién creada al estado
       })
@@ -33,13 +33,13 @@ function App() {
 
     // Actualizar en el backend
     const todoToUpdate = updatedTodos.find(todo => todo._id === id);
-    axios.put(`https://mytodo-c4mh.onrender.com/api/todos${id}`, todoToUpdate)
+    axios.put(`https://mytodo-c4mh.onrender.com/api/todos/${id}`, todoToUpdate)
       .catch(error => console.error('Error updating todo:', error));
   };
 
   // Eliminar tarea
   const handleRemove = (id) => {
-    axios.delete(`https://mytodo-c4mh.onrender.com/api/todos${id}`)
+    axios.delete(`https://mytodo-c4mh.onrender.com/api/todos/${id}`)
       .then(() => {
         setTodos(todos.filter(todo => todo._id !== id)); // Eliminar del estado local
       })
