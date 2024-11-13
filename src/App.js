@@ -6,26 +6,39 @@ import TodoList from './TodoList';
 
 function App() {
   const [todos, setTodos] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Cargar las tareas desde el backend (MongoDB)
   useEffect(() => {
-    axios.get('https://mytodo-c4mh.onrender.com/api/todos/') // Cambia por tu URL de backend
-      .then(response => setTodos(response.data))
-      .catch(error => console.error('Error fetching todos:', error));
-  }, []); 
+    const fetchTodos = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get('https://mytodo-c4mh.onrender.com/api/todos');
+        setTodos(response.data);
+      } catch (err) {
+        setError('Error fetching todos: ' + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTodos();
+  }, []); // Dependencia vacía para que solo se ejecute una vez
 
   // Agregar tarea
-  const handleAdd = (text) => {
+  const handleAdd = async (text) => {
     const newTodo = { text, completed: false };
-    axios.post('https://mytodo-c4mh.onrender.com/api/todos/', newTodo)
-      .then(response => {
-        setTodos([...todos, response.data]); // Agregar la tarea recién creada al estado
-      })
-      .catch(error => console.error('Error adding todo:', error));
+    try {
+      const response = await axios.post('https://mytodo-c4mh.onrender.com/api/todos', newTodo);
+      setTodos((prevTodos) => [...prevTodos, response.data]); // Usar el estado anterior para evitar posibles problemas de sincronización
+    } catch (error) {
+      setError('Error adding todo: ' + error.message);
+    }
   };
 
   // Marcar tarea como completada o no
-  const handleToggle = (id) => {
+  const handleToggle = async (id) => {
     const updatedTodos = todos.map(todo =>
       todo._id === id ? { ...todo, completed: !todo.completed } : todo
     );
@@ -33,23 +46,30 @@ function App() {
 
     // Actualizar en el backend
     const todoToUpdate = updatedTodos.find(todo => todo._id === id);
-    axios.put(`https://mytodo-c4mh.onrender.com/api/todos/${id}`, todoToUpdate)
-      .catch(error => console.error('Error updating todo:', error));
+    try {
+      await axios.put(`https://mytodo-c4mh.onrender.com/api/todos/${id}`, todoToUpdate);
+    } catch (error) {
+      setError('Error updating todo: ' + error.message);
+    }
   };
 
   // Eliminar tarea
-  const handleRemove = (id) => {
-    axios.delete(`https://mytodo-c4mh.onrender.com/api/todos/${id}`)
-      .then(() => {
-        setTodos(todos.filter(todo => todo._id !== id)); // Eliminar del estado local
-      })
-      .catch(error => console.error('Error deleting todo:', error));
+  const handleRemove = async (id) => {
+    try {
+      await axios.delete(`https://mytodo-c4mh.onrender.com/api/todos/${id}`);
+      setTodos((prevTodos) => prevTodos.filter(todo => todo._id !== id)); // Filtramos el estado
+    } catch (error) {
+      setError('Error deleting todo: ' + error.message);
+    }
   };
 
   return (
     <div className="App min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
       <h1 className="text-4xl font-bold text-blue-600 mb-4">Mi aplicación TODO</h1>
       <p className="text-xl text-gray-700 mb-6">¡Bienvenido a mi lista de tareas!</p>
+
+      {loading && <p className="text-lg text-gray-700">Cargando tareas...</p>}
+      {error && <p className="text-lg text-red-600">{error}</p>}
 
       <TodoForm onAdd={handleAdd} />
 
@@ -59,6 +79,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
