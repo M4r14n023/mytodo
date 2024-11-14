@@ -1,43 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import TodoList from './TodoList';
-import TodoForm from './TodoForm';
+import React, { useState } from 'react';
 
-const App = () => {
-  const [todos, setTodos] = useState([]);
+const TodoForm = ({ onAdd }) => {
+  const [value, setValue] = useState('');
 
-  // Cargar tareas desde el backend al inicio
-  useEffect(() => {
-    const fetchTodos = async () => {
-      try {
-        const response = await axios.get('/api/todos');
-        setTodos(response.data);
-      } catch (error) {
-        console.error('Error al cargar las tareas:', error);
-      }
-    };
-    fetchTodos();
-  }, []);
-
-  // Función para agregar una nueva tarea
-  const addTodo = async (text) => {
-    try {
-      const response = await axios.post('/api/todos', { text });
-      setTodos((prevTodos) => [...prevTodos, response.data]);
-    } catch (error) {
-      console.error('Error al agregar la tarea:', error);
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!value.trim()) return;
+    onAdd(value);
+    setValue('');
   };
 
   return (
-    <div className="app">
-      <h1>Lista de Tareas</h1>
-      <TodoForm onAdd={addTodo} />
-      <TodoList todos={todos} />
-    </div>
+    <form onSubmit={handleSubmit} className="todo-form">
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Agregar una nueva tarea..."
+      />
+      <button type="submit">Agregar Tarea</button>
+    </form>
   );
 };
 
-export default App;
+export default TodoForm;
 
 
 
