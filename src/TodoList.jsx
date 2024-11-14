@@ -6,7 +6,7 @@ const TodoList = ({ todos = [], onToggle, onRemove }) => {
     <ul className="w-full max-w-lg space-y-4">
       {Array.isArray(todos) && todos.length > 0 ? (
         todos.map((todo) => (
-          <TodoItem key={todo.id} todo={todo} onToggle={onToggle} onRemove={onRemove} />
+          <TodoItem key={todo._id} todo={todo} onToggle={onToggle} onRemove={onRemove} />
         ))
       ) : (
         <p>No hay tareas para mostrar.</p>
@@ -16,6 +16,7 @@ const TodoList = ({ todos = [], onToggle, onRemove }) => {
 };
 
 export default TodoList;
+
 
 
 
