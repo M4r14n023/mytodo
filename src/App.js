@@ -14,7 +14,7 @@ function App() {
     const fetchTodos = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/todos');
+        const response = await axios.get('https://mytodo-c4mh.onrender.com/api/todos');
         setTodos(response.data);
       } catch (err) {
         setError('Error fetching todos: ' + err.message);
