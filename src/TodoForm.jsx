@@ -1,32 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import TodoList from './TodoList';
+import TodoForm from './TodoForm';
 
-const TodoForm = ({ onAdd }) => {
-  const [value, setValue] = useState('');
+const App = () => {
+  const [todos, setTodos] = useState([]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!value.trim()) return;
-    onAdd(value);
-    setValue('');
+  // Cargar tareas desde el backend al inicio
+  useEffect(() => {
+    const fetchTodos = async () => {
+      try {
+        const response = await axios.get('/api/todos');
+        setTodos(response.data);
+      } catch (error) {
+        console.error('Error al cargar las tareas:', error);
+      }
+    };
+    fetchTodos();
+  }, []);
+
+  // Función para agregar una nueva tarea
+  const addTodo = async (text) => {
+    try {
+      const response = await axios.post('/api/todos', { text });
+      setTodos((prevTodos) => [...prevTodos, response.data]);
+    } catch (error) {
+      console.error('Error al agregar la tarea:', error);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg mb-6">
-      <input
-        type="text"
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder="Agregar una nueva tarea..."
-      />
-      <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">
-        Agregar Tarea
-      </button>
-    </form>
+    <div className="app">
+      <h1>Lista de Tareas</h1>
+      <TodoForm onAdd={addTodo} />
+      <TodoList todos={todos} />
+    </div>
   );
 };
 
-export default TodoForm;
+export default App;
+
 
 
 
