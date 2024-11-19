@@ -17,12 +17,12 @@
     "serve": "^14.2.4",
     "tailwindcss": "^3.4.14"
   },
-"scripts": {
-  "start": "react-scripts start",
-  "build": "react-scripts build --openssl-legacy-provider",
-  "test": "react-scripts test",
-  "eject": "react-scripts eject"
-},
+  "scripts": {
+    "start": "serve -s build",
+    "build": "react-scripts build --openssl-legacy-provider",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
   "engines": {
     "node": "18.x"
   },
